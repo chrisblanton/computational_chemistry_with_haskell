@@ -1,4 +1,4 @@
-dist
+tdist
 dist-*
 cabal-dev
 *.o

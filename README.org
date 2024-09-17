@@ -1,0 +1,12 @@
+#+TITLE: Computational chemistry using Haskell
+#+AUTHOR: Christopher Blanton, Ph.D
+* Introduction
+The goal of this repository where computational chemistry using
+the functional programming Haskell.
+
+
+
+
+
+
+
