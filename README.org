@@ -2,11 +2,35 @@
 #+AUTHOR: Christopher Blanton, Ph.D
 * Introduction
 The goal of this repository where computational chemistry using
-the functional programming Haskell.
+the functional programming language Haskell.
+* Programming Environment
+The environment for the programming is supported using Nix.
+#+begin_src nix :tangle shell.nix
+  let
+    myNixPkgs = import <nixpkgs> {};
+  in
+  myNixPkgs.mkShell {
+    nativeBuildInputs = with myNixPkgs; [
+      cabal-install
+      ghc
+    ];
+  }
+#+end_src
+When the above has been tangled (the file created), ~direnv~ will need it to be allowed with
+#+begin_src shell
+  direnv allow
+#+end_src
+in order to use ~direnv~.
 
+In order to test basic functionally, let us run a basic "Hello World!" in Haskell:
+#+begin_src haskell :tangle hello.hs
+  main = putStrLn "Hello World!"
+#+end_src
+The program is ran with:
+#+begin_src shell :result verbatim
+  runghc hello.hs
+#+end_src
 
-
-
-
-
+#+RESULTS:
+: Hello World!
 

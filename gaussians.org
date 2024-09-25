@@ -1,0 +1,13 @@
+#+title: Gaussian Functions
+#+author: Christopher Blanton, Ph.D.
+* Introduction
+The Gaussian Functions remain one of the keystones of computational chemistry due to the computational properties.
+The general form of the 1-dimensional Gaussian Function is
+\begin{equation}
+G(\alpha,x,A,B,n) = (x-A)^n\exp(-\alpha(x-B)^2),
+\end{equation}
+where $\alpha$ is a parameter that controls the /sharpness/ of the function, $A$ controls
+the centering of the nodes, $B$ controls the centering of the middle of the function, and
+$n$ controls the /order/ of the function. Typically, $A=B$ but these may be varied if desired.
+* Cusp Condition
+While Gaussian Functions do not satisfy the needed cusp condition:
