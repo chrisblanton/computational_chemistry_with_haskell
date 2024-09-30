@@ -2,12 +2,48 @@
 #+author: Christopher Blanton, Ph.D.
 * Introduction
 The Gaussian Functions remain one of the keystones of computational chemistry due to the computational properties.
+* 1-Dimensional Gaussian
 The general form of the 1-dimensional Gaussian Function is
 \begin{equation}
-G(\alpha,x,A,B,n) = (x-A)^n\exp(-\alpha(x-B)^2),
+G(\alpha,A,B,C,n,x) = C(x-A)^n\exp(-\alpha(x-B)^2), \tag{1}
 \end{equation}
 where $\alpha$ is a parameter that controls the /sharpness/ of the function, $A$ controls
-the centering of the nodes, $B$ controls the centering of the middle of the function, and
-$n$ controls the /order/ of the function. Typically, $A=B$ but these may be varied if desired.
-* Cusp Condition
-While Gaussian Functions do not satisfy the needed cusp condition:
+the centering of the nodes, $B$ controls the centering of the middle of the function, $C$ is a constant,
+$n$ controls the /order/ of the function, and \(x\) is the position coordinate.
+Typically, $A=B$ but these may be varied if desired.
+
+Let us define the Gaussian in the most straight-forward implementation:
+#+begin_src haskell :results verbatim
+  gaussian1Dnaive :: Float -> Float -> Float -> Float -> Int -> Float -> Float
+  gaussian1Dnaive alpha a b c n x = c * ((x - a)**n) * exp (-alpha * (x  - b)**2)
+  result = gaussian1Dnaive 1.0 0.0 0.0 0 0.0
+  result
+#+end_src
+
+#+RESULTS:
+: ()
+
+
+Let us simplify the definition in order to make our implementation into simple functions that
+can enhance our ability to understand what we are doing and  why we are doing it.
+
+Ultimately, we want to separate any components that must contain \(x\) from anything that does not.
+The main benefit  is that we will calculate integrals of Gaussian Functions. The
+terms that include \(x\) are the two binomials:
+\begin{displaymath}
+(x-A)^n, (x-B)^2
+\end{displaymath}
+The general way to handle a binomial is to use the *Binomial Expansion*.
+** Binomial Expansion
+The binomial expansion is
+\begin{equation}
+(x+y)^n = \sum_{k=0}^n \binom{n}{k}x^{n-k}y^k \tag{2}
+\end{equation}
+where \(\binom{n}{k}\) is the *binomial coefficient*:
+\begin{equation}
+\binom{n}{k} =; \frac{n!}{k!(n-k)!}. \tag{3}
+\end{equation}
+
+** Gaussian Product Rule
+The *Gaussian Product Rule* is a powerful tool that...
+
