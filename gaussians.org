@@ -1,32 +1,56 @@
-#+title: Gaussian Functions
+#+title:Gaussian Functions
 #+author: Christopher Blanton, Ph.D.
 * Introduction
 The Gaussian Functions remain one of the keystones of computational chemistry due to the computational properties.
-* 1-Dimensional Gaussian
+In this section, I will set up the basic file for our Haskell module file to handle the needed
+functions and data types for exploring this topic. The name of the file is ~GTF.hs~ for Gaussian-Type Functions.
+
+Gaussian Functions are named after Carl Frederick Gauss. A Gaussian function is useful
+because it resembles other wave function forms, but has an analytical close form
+for its indefinite integrals.
+
+* 1-Dimensional Gaussian in Cartesian Coordinates 
 The general form of the 1-dimensional Gaussian Function is
 \begin{equation}
-G(\alpha,A,B,C,n,x) = C(x-A)^n\exp(-\alpha(x-B)^2), \tag{1}
+G(\alpha,A,B,C,n,x) = C(x-B)^n\exp(-\alpha(x-A)^2), \tag{1}
 \end{equation}
-where $\alpha$ is a parameter that controls the /sharpness/ of the function, $A$ controls
-the centering of the nodes, $B$ controls the centering of the middle of the function, $C$ is a constant,
-$n$ controls the /order/ of the function, and \(x\) is the position coordinate.
-Typically, $A=B$ but these may be varied if desired.
+where $\alpha$ is a parameter that controls the /sharpness/ of the function, $A$
+controls the centering of the peak, $B$ controls the placement of nodes, $C$ is
+a constant, $n$ controls the /order/ of the function (which also gives the number
+of nodes (which may be complex or duplicate roots of the polynomial), and \(x\)
+is the position coordinate. Typically, $A=B$ but these may be varied if desired.
 
 Let us define the Gaussian in the most straight-forward implementation:
-#+begin_src haskell :results verbatim
+#+begin_src haskel :tangle GTF.hs
   gaussian1Dnaive :: Float -> Float -> Float -> Float -> Int -> Float -> Float
-  gaussian1Dnaive alpha a b c n x = c * ((x - a)**n) * exp (-alpha * (x  - b)**2)
-  result = gaussian1Dnaive 1.0 0.0 0.0 0 0.0
-  result
+  gaussian1Dnaive alpha a b c n x = c * ((x - b)^n) * exp (-alpha * (x  - a)^2)
+#+end_src
+The implementation is straight-forward, but it implicitly hides parts and we may
+need to calculate this function many times. Let us simplify the definition in
+order to make our implementation into simple functions that can enhance our
+ability to understand what we are doing and why we are doing it.
+
+* Creating a Gaussian Parameter Type
+In most cases, the major of the variables in the GTF definition are _parameters_.
+They are not usually varied as much as the main variable, \(x\). Let's define a
+new data type:
+#+begin_src haskell :tangle GTF.hs
+  data GTFParam = GTFParam
+    { alpha :: Float,
+      a :: Float,
+      b :: Float,
+      c :: Float,
+      n :: Int
+    }
 #+end_src
 
-#+RESULTS:
-: ()
+Let's construct a version of the naive general GTF that can use the ~GTFParam~:
+#+begin_src haskell :tangle GTF.hs
+  gaussian1DnaiveParam :: GTFParam -> Float -> Float
+  gaussian1DnaiveParam myGTFParam x = gaussian1Dnaive (alpha myGTFParam) (a myGTFParam) (b myGTFParam) (c myGTFParam) (n  myGTFParam) x
+#+end_src
 
-
-Let us simplify the definition in order to make our implementation into simple functions that
-can enhance our ability to understand what we are doing and  why we are doing it.
-
+* Separating Variables from Constants
 Ultimately, we want to separate any components that must contain \(x\) from anything that does not.
 The main benefit  is that we will calculate integrals of Gaussian Functions. The
 terms that include \(x\) are the two binomials:
@@ -41,9 +65,55 @@ The binomial expansion is
 \end{equation}
 where \(\binom{n}{k}\) is the *binomial coefficient*:
 \begin{equation}
-\binom{n}{k} =; \frac{n!}{k!(n-k)!}. \tag{3}
+\binom{n}{k} = \frac{n!}{k!(n-k)!}. \tag{3}
 \end{equation}
+The binomial coefficient is also the value for combinations, i.e.
+the number of ways that \(k\) elements can be chosen from a set of
+\(n\) elements.
 
-** Gaussian Product Rule
+Let us implement the Factorial function for use in ~GTF~:
+#+begin_src haskell :tangle MyMath.hs
+  factorialInt :: Int -> Int
+  factorialInt n
+    | n == 0 = 1
+    | n > 0 = n * factorialInt (n - 1)
+    | otherwise = 0
+#+end_src
+Note that, in this case, I used the _guard_ construct. This is a more-readable
+alternative to use a set of nested ~if~ statements.
+
+Let us now implement the calculation of the binomial coefficient:
+#+begin_src haskell :tangle MyMath.hs
+  binom :: Int -> Int -> Int
+  binom n k = factorialInt n `div` ( factorialInt n *  factorialInt  (n-k))
+#+end_src
+Note that the division operator used is ~div~ which does Integer division.
+** Expanding the Gaussian Function using the Binomial Expansion
+*** Binomial in the Exponential
+\begin{equation*}
+(x-A)^2 = \sum_{k=0}^2 \binom{2}{k} x^{2-k}(-A)^{k} 
+\end{equation*}
+We'll substitute into the exponential function
+\begin{equation*}
+\exp(-\alpha(x-A)^2) = \exp\left(-\alpha\left(\sum_{k=0}^2 \binom{2}{k} x^{2-k}(-A)^{k} \right) \right)
+\end{equation*}
+We then use the Product Law of Exponents to get
+?\begin{equation*}
+\exp(-\alpha(x-A)^2) = \exp(\alpha)\exp(-A^2)\exp(2Ax)\exp(-x^2)
+\end{equation*}
+Combining the \(x\) terms and distributing the \(\alpha\)
+gives
+\begin{equation*}
+\exp
+\end{equation*}
+
+*** Binomial before the Exponential
+\begin{equation*}
+(x-B)^n = \sum_{k=0}^{n} \binom{n}{k}x^{n-k}(-B)^k 
+\end{equation*}
+
+
+
+* Gaussian Product Rule
 The *Gaussian Product Rule* is a powerful tool that...
 
